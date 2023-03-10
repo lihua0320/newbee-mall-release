@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ltd.newbee.mall.dao.UsersMapper">
+
+    <resultMap id="BaseResultMap" type="ltd.newbee.mall.entity.Users">
+        <id column="user_id" property="userId"></id>
+        <result column="nick_name" property="nickName"></result>
+        <result column="login_name" property="loginName"></result>
+        <result column="password_md5" property="passwordMd5"></result>
+        <result column="introduce_sign" property="introduceSign"></result>
+        <result column="address" property="address"></result>
+        <result column="is_deleted" property="isDeleted"></result>
+        <result column="locked_flag" property="lockedFlag"></result>
+        <result column="create_time" property="createTime"></result>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        user_id,nick_name,login_name,password_md5,introduce_sign,address,is_deleted,locked_flag,
+        create_time
+    </sql>
+    <select id="selectByLoginName" parameterType="java.lang.String" resultMap="BaseResultMap">
+      select
+          <include refid="Base_Column_List"/>
+          from tb_newbee_mall_user
+          where login_name = #{loginName} and is_deleted = 0
+    </select>
+    <select id="selectByLoginNameAndPasswd" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+            from tb_newbee_mall_user
+            where login_name = #{loginName} and password_md5=#{password} and is_deleted=0
+    </select>
+    <!--    分页列表数据-->
+    <select id="findUsersList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from tb_newbee_mall_user
+    where 1=1
+    <if test="loginName!=null and loginName!=''">and login_name = #{loginName} </if>
+    order by create_time desc
+    <if test="start!=null and limit!=null">limit #{start},#{limit} </if>
+
+    </select>
+
+    <select id="getTotalUsers" resultType="int">
+    select count(*) from tb_newbee_mall_user
+                    where 1=1
+    <if test="loginName!=null and loginName!=''">
+        and login_name = #{loginName} </if>
+
+    </select>
+
+    <insert id="insertSelective" parameterType="ltd.newbee.mall.entity.Users">
+        insert into tb_newbee_mall_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId !=null">
+                user_id,
+            </if>
+            <if test="nickName !=null">
+                nick_name,
+            </if>
+            <if test="loginName !=null">
+                login_name,
+            </if>
+            <if test="passwordMd5 !=null">
+                password_md5,
+            </if>
+            <if test="introduceSign !=null">
+                introduce_sign,
+            </if>
+            <if test="address !=null">
+                address,
+            </if>
+            <if test="isDeleted !=null">
+                is_deleted,
+            </if>
+            <if test="lockedFlag !=null">
+                locked_flag,
+            </if>
+            <if test="createTime !=null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId !=null">
+                #{userId},
+            </if>
+            <if test="nickName !=null">
+                #{nickName},
+            </if>
+            <if test="loginName !=null">
+                #{loginName},
+            </if>
+            <if test="passwordMd5 !=null">
+                #{passwordMd5},
+            </if>
+            <if test="introduceSign !=null">
+                #{introduceSign},
+            </if>
+            <if test="address !=null">
+                #{address},
+            </if>
+            <if test="isDeleted !=null">
+                #{isDeleted},
+            </if>
+            <if test="lockedFlag !=null">
+                #{lockedFlag},
+            </if>
+            <if test="createTime !=null">
+                #{createTime},
+            </if>
+        </trim>
+    </insert>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_newbee_mall_user
+        where user_id = #{userId,jdbcType=BIGINT} and is_deleted = 0
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="ltd.newbee.mall.entity.Users">
+        update tb_newbee_mall_user
+        <set>
+            <if test="nickName != null">
+                nick_name = #{nickName},
+            </if>
+            <if test="loginName != null">
+                login_name = #{loginName},
+            </if>
+            <if test="passwordMd5 != null">
+                password_md5 = #{passwordMd5},
+            </if>
+            <if test="introduceSign != null">
+                introduce_sign = #{introduceSign},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+            <if test="lockedFlag != null">
+                locked_flag = #{lockedFlag},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <update id="lockUserBatch">
+        update tb_newbee_mall_user
+        set locked_flag=#{lockStatus} where user_id in
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>
